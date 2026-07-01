@@ -1,0 +1,40 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Local environment variables
+.env
+.env.local
+.env.*.local
+
+# Log files
+*.log
+
+# Vite cache
+.vite/
+
+# Editor directories and files
+# Track `.vscode/settings.json` (YAML schemas); keep other `.vscode/*` local.
+.vscode/*
+!.vscode/
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Test results
+tests/results/
+playwright-report/
+test-results/
+coverage/
+.coverage/
+.artifacts/
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+

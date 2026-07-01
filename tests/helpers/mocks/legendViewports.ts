@@ -1,0 +1,55 @@
+import theme from "@/theme/theme";
+
+/** Viewport presets for legend responsive integration tests (matches getDeviceType breakpoints). */
+export const legendViewports = {
+  mobile: {
+    isMobile: true,
+    isTablet: false,
+    isDesktop: false,
+    isXLarge: false,
+    isMobileLayout: true,
+    isTabletLayout: false,
+    isDesktopLayout: false,
+    isXLargeLayout: false,
+    screenWidth: 375,
+    screenHeight: 667,
+    rawScreenWidth: 375,
+    rawScreenHeight: 667,
+    isBelowMinViewport: false,
+    theme,
+  },
+  tablet: {
+    isMobile: false,
+    isTablet: true,
+    isDesktop: false,
+    isXLarge: false,
+    isMobileLayout: false,
+    isTabletLayout: true,
+    isDesktopLayout: false,
+    isXLargeLayout: false,
+    screenWidth: 768,
+    screenHeight: 1024,
+    rawScreenWidth: 768,
+    rawScreenHeight: 1024,
+    isBelowMinViewport: false,
+    theme,
+  },
+  desktop: {
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    isXLarge: false,
+    isMobileLayout: false,
+    isTabletLayout: false,
+    isDesktopLayout: true,
+    isXLargeLayout: false,
+    screenWidth: 1200,
+    screenHeight: 800,
+    rawScreenWidth: 1200,
+    rawScreenHeight: 800,
+    isBelowMinViewport: false,
+    theme,
+  },
+} as const;
+
+export type LegendViewportPreset = keyof typeof legendViewports;

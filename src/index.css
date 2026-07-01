@@ -1,0 +1,84 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* color-scheme, text, and page background come from MUI CssBaseline + ThemeProvider (light/dark via map style toggle). Do not fix light theme here — it prevented dark mode from applying. */
+
+  /* Theme-driven CSS vars are set via MuiCssBaseline in src/theme/theme.ts. */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+  --viewport-height: 100dvh;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-focus);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--color-focus-hover);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: stretch;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: auto;
+}
+
+/* Narrow layout (hysteresis: enter ≤280px, leave ≥300px) so legend/timeline stay in flow and don't jump during resize.
+   !important overrides fixed positioning from Legend/Timeline so they lay out in-flow when narrow.
+   --app-min-width is set from JS (APP_MIN_WIDTH in breakpoints.ts).
+   MapLegendColumn.tsx sx props handle flex/minHeight/marginTop for the container; only the position overrides need CSS here. */
+body[data-narrow-layout="true"] #legend,
+body[data-narrow-layout="true"] #timeline {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  min-width: var(--app-min-width, 300px) !important;
+}
+
+/* Accessibility utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+a:focus-visible {
+  outline: none;
+  color: var(--color-text-black);
+  font-weight: 600;
+  text-decoration: none;
+}
+

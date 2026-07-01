@@ -1,0 +1,133 @@
+name: CI and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One run per branch/PR head; do not cancel in-progress runs on `main` (avoid interrupting Pages deploy).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  lint-typecheck:
+    name: Lint and Typecheck
+    runs-on: ubuntu-latest
+    env:
+      VITE_STADIA_API_KEY: ${{ secrets.VITE_STADIA_API_KEY || 'test-key-for-ci' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup repo
+        uses: ./.github/actions/setup
+
+      - name: Run lint checks
+        run: npm run lint:check && npm run lint:css-boundaries
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Validate towns data contract
+        run: npm run validate:data
+
+  unit-integration-coverage:
+    name: Integration lane and Vitest coverage (ratchet)
+    runs-on: ubuntu-latest
+    needs: lint-typecheck
+    timeout-minutes: 25
+    env:
+      VITE_STADIA_API_KEY: ${{ secrets.VITE_STADIA_API_KEY || 'test-key-for-ci' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup repo
+        uses: ./.github/actions/setup
+
+      - name: Run integration lane
+        run: npm run test:integration
+
+      - name: Run coverage lane
+        run: npm run test:coverage:ci
+        timeout-minutes: 20
+
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: lint-typecheck
+    timeout-minutes: 30
+    env:
+      VITE_STADIA_API_KEY: test-key-for-ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup repo
+        uses: ./.github/actions/setup
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/results/reports/html
+          retention-days: 7
+
+  build-and-bundle:
+    name: Build and Bundle Checks
+    runs-on: ubuntu-latest
+    needs: [unit-integration-coverage, e2e]
+    env:
+      VITE_STADIA_API_KEY: ${{ secrets.VITE_STADIA_API_KEY || 'test-key-for-ci' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup repo
+        uses: ./.github/actions/setup
+
+      - name: Build deploy output
+        run: node scripts/build-gh-pages.cjs
+
+      - name: Check built HTML
+        run: node scripts/check-built-html.cjs
+
+      - name: Check bundle budget
+        run: node scripts/check-bundle-size.js
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./dist"
+
+  # Requires: Repo Settings → Pages → Build and deployment → Source = "GitHub Actions"
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [build-and-bundle]
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
