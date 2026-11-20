@@ -12,6 +12,7 @@ import { Layer, Source, LayerProps } from "react-map-gl/maplibre";
 import {
   MAP_LABEL_SORT_RANK_PROP,
   MAP_LABEL_TEXT_PROP,
+  MAP_TOWN_ID_PROP,
   POPULATION_THRESHOLDS,
   MIN_MARKER_SIZE,
   MAX_MARKER_SIZE,
@@ -20,7 +21,10 @@ import {
 } from "@/constants";
 import { GeoJSON } from "geojson";
 import { useMapLayerExpressions } from "@/hooks/map";
-import { POPULATION_FOR_YEAR_PROP } from "@/utils/map";
+import {
+  POPULATION_FOR_YEAR_PROP,
+  getMapLabelTextSizeExpression,
+} from "@/utils/map";
 import type { MapBaseStyleMode } from "@/utils/map/style/terrainStyle";
 
 interface MapLayerProps extends Omit<
@@ -75,15 +79,7 @@ const MapLayer = ({
       "text-anchor": "top" as const,
       "text-justify": "center" as const,
       "text-offset": [0, 1] as [number, number],
-      "text-size": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        3,
-        9,
-        8,
-        17,
-      ] as ExpressionSpecification,
+      "text-size": getMapLabelTextSizeExpression(),
       "text-max-width": 16,
       "text-line-height": 1.2,
       "text-padding": 2,
@@ -105,7 +101,12 @@ const MapLayer = ({
   );
 
   return (
-    <Source id={sourceId} type="geojson" data={data}>
+    <Source
+      id={sourceId}
+      type="geojson"
+      data={data}
+      promoteId={MAP_TOWN_ID_PROP}
+    >
       <Layer
         id={`${layerId}-circle`}
         type="circle"

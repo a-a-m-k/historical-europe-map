@@ -1,12 +1,21 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 
 import { TownMarkerItem } from "@/components/map/MapView/TownMarkers/TownMarkerItem";
 import type { Town } from "@/common/types";
 import { lightTheme } from "@/theme/theme";
 
 const enableTownMarkerFocusSpy = vi.hoisted(() => vi.fn());
+const mapMock = vi.hoisted(() => ({
+  zoom: 5.5,
+  zoomHandler: undefined as (() => void) | undefined,
+  getZoom: vi.fn(() => mapMock.zoom),
+  on: vi.fn((_event: string, handler: () => void) => {
+    mapMock.zoomHandler = handler;
+  }),
+  off: vi.fn(),
+}));
 
 vi.mock("@mui/material/styles", async importOriginal => {
   const actual = await importOriginal<typeof import("@mui/material/styles")>();
@@ -20,6 +29,7 @@ vi.mock("react-map-gl/maplibre", () => ({
   Marker: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="marker-wrapper">{children}</div>
   ),
+  useMap: () => ({ current: mapMock }),
 }));
 
 vi.mock("@/context/MapStyleContext", () => ({
@@ -58,6 +68,8 @@ describe("TownMarkerItem", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mapMock.zoom = 5.5;
+    mapMock.zoomHandler = undefined;
   });
 
   it("renders marker with accessible role and aria-label", () => {
@@ -92,6 +104,28 @@ describe("TownMarkerItem", () => {
 
     expect(screen.getByText("Paris")).toBeInTheDocument();
     expect(screen.getByText("35,000")).toBeInTheDocument();
+  });
+
+  it("scales label font size with map zoom", () => {
+    const { container, unmount } = render(
+      <TownMarkerItem {...baseProps} isFocused />
+    );
+    const label = container.querySelector(
+      ".town-marker-label-container"
+    ) as HTMLElement;
+
+    expect(label.style.getPropertyValue("--town-marker-label-font-size")).toBe(
+      "13px"
+    );
+
+    mapMock.zoom = 8;
+    act(() => mapMock.zoomHandler?.());
+    expect(label.style.getPropertyValue("--town-marker-label-font-size")).toBe(
+      "17px"
+    );
+
+    unmount();
+    expect(mapMock.off).toHaveBeenCalledWith("zoom", mapMock.zoomHandler);
   });
 
   it("focuses marker on click", () => {

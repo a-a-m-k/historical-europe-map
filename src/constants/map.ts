@@ -10,6 +10,16 @@ export const INITIAL_ZOOM_OUT_OFFSET = 0.25;
 export const MAP_MUTED_SLATE_RGBA = `rgba(93, 99, 105, ${128 / 255})`;
 
 export const MAP_LAYER_ID = "towns-population-layer";
+/** GeoJSON source id created by `MapLayer` for `MAP_LAYER_ID`. */
+export const MAP_LAYER_SOURCE_ID = `${MAP_LAYER_ID}-source`;
+
+/**
+ * Town feature property promoted to the MapLibre feature id (`promoteId`) so feature-state
+ * can target a town. Matches `getStableTownMarkerId`, which also keys the HTML markers.
+ */
+export const MAP_TOWN_ID_PROP = "townId" as const;
+/** Feature-state flag that hides a town's symbol label while its HTML label is shown. */
+export const MAP_LABEL_HIDDEN_STATE = "labelHidden" as const;
 
 /**
  * Set on each town feature in `townsToGeoJSON` for `circle-sort-key` (WebGL circles).
@@ -25,6 +35,14 @@ export const POPULATION_SORT_KEY_PROP = "populationSortKey" as const;
 export const MAP_LABEL_SORT_RANK_PROP = "mapLabelSortRank" as const;
 /** Precomputed text for the MapLibre symbol `text-field` (name + population / N/A). */
 export const MAP_LABEL_TEXT_PROP = "mapLabelText" as const;
+/**
+ * `[zoom, px]` stops for town label text size, linearly interpolated and clamped outside the range.
+ * Shared by the MapLibre symbol layer and the HTML focused-marker label so both scale together.
+ */
+export const MAP_LABEL_TEXT_SIZE_ZOOM_STOPS = [
+  [3, 9],
+  [8, 17],
+] as const;
 
 /** Below any realistic population value so N/A towns stay under measured cities. */
 export const POPULATION_SORT_KEY_NO_DATA = -1_000_000_000;

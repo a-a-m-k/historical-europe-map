@@ -2,9 +2,11 @@ import { Town } from "@/common/types";
 import {
   MAP_LABEL_SORT_RANK_PROP,
   MAP_LABEL_TEXT_PROP,
+  MAP_TOWN_ID_PROP,
   POPULATION_SORT_KEY_NO_DATA,
   POPULATION_SORT_KEY_PROP,
 } from "@/constants/map";
+import { getStableTownMarkerId } from "./markers/townMarkerUtils";
 import { isValidTown } from "./zoom/zoomHelpers";
 import { logger } from "./logger";
 
@@ -99,6 +101,7 @@ export function townsToGeoJSON(
       },
       properties: {
         name: town.name,
+        [MAP_TOWN_ID_PROP]: getStableTownMarkerId(town),
         populationForYear,
         [POPULATION_SORT_KEY_PROP]: populationSortKey,
         [MAP_LABEL_SORT_RANK_PROP]: labelSortRank,

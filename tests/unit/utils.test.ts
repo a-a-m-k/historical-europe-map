@@ -11,6 +11,7 @@ import {
   POPULATION_SORT_KEY_NO_DATA,
   POPULATION_SORT_KEY_PROP,
 } from "../../src/constants/map";
+import { getStableTownMarkerId } from "../../src/utils/markers/townMarkerUtils";
 import { mockTowns } from "../helpers/testUtils";
 
 vi.mock("../../src/utils/logger", () => ({
@@ -117,6 +118,13 @@ describe("townsToGeoJSON", () => {
     const geoJSON = townsToGeoJSON(mockTowns, 1000);
     const paris = geoJSON.features.find(f => f.properties?.name === "Paris");
     expect(paris?.properties?.mapLabelText).toBe("Paris\n20,000");
+  });
+
+  it("sets townId matching the HTML marker id for feature-state targeting", () => {
+    const geoJSON = townsToGeoJSON(mockTowns, 1000);
+    const paris = geoJSON.features.find(f => f.properties?.name === "Paris");
+    const parisTown = mockTowns.find(t => t.name === "Paris")!;
+    expect(paris?.properties?.townId).toBe(getStableTownMarkerId(parisTown));
   });
 
   it("uses POPULATION_SORT_KEY_NO_DATA when the year has no population", () => {

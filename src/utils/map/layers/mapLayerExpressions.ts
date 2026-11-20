@@ -1,6 +1,7 @@
 import type { ExpressionSpecification } from "maplibre-gl";
 import { MAP_LEGEND_COLORS } from "@/constants";
 import {
+  MAP_LABEL_TEXT_SIZE_ZOOM_STOPS,
   POPULATION_SORT_KEY_NO_DATA,
   POPULATION_SORT_KEY_PROP,
 } from "@/constants/map";
@@ -46,6 +47,33 @@ export const getPopulationSortKey = (): ExpressionSpecification => [
     POPULATION_SORT_KEY_NO_DATA,
   ],
 ];
+
+/** Zoom-interpolated `text-size` for town labels in the symbol layer. */
+export const getMapLabelTextSizeExpression = (): ExpressionSpecification => [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  ...MAP_LABEL_TEXT_SIZE_ZOOM_STOPS.flat(),
+];
+
+/**
+ * Same curve as `getMapLabelTextSizeExpression`, evaluated in JS for HTML labels.
+ */
+export const getMapLabelTextSize = (zoom: number): number => {
+  const stops = MAP_LABEL_TEXT_SIZE_ZOOM_STOPS;
+  const [firstZoom, firstSize] = stops[0];
+  const [lastZoom, lastSize] = stops[stops.length - 1];
+  if (zoom <= firstZoom) return firstSize;
+  if (zoom >= lastZoom) return lastSize;
+  for (let i = 1; i < stops.length; i++) {
+    const [z1, s1] = stops[i];
+    if (zoom <= z1) {
+      const [z0, s0] = stops[i - 1];
+      return s0 + ((zoom - z0) / (z1 - z0)) * (s1 - s0);
+    }
+  }
+  return lastSize;
+};
 
 /**
  * Builds a MapLibre expression to determine the circle radius for map markers based on population data for a given century.

@@ -16,6 +16,7 @@ vi.mock("@/utils/markers", () => ({
 
 vi.mock("@/hooks/map", () => ({
   useMarkerKeyboardNavigation: () => vi.fn(),
+  useHiddenTownLabel: vi.fn(),
 }));
 
 vi.mock("@/components/map/MapView/TownMarkers/TownMarkerItem", () => ({

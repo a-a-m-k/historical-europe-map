@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { Town } from "@/common/types";
-import { useMarkerKeyboardNavigation } from "@/hooks/map";
+import { useHiddenTownLabel, useMarkerKeyboardNavigation } from "@/hooks/map";
 import { disableTownMarkerFocus, getStableTownMarkerId } from "@/utils/markers";
 import { TownMarkerItem } from "./TownMarkerItem";
 
@@ -31,6 +31,15 @@ export const TownMarkers: React.FC<TownMarkersProps> = ({
       return bPop - aPop;
     });
   }, [towns, selectedYear]);
+
+  const focusedTownId = useMemo(() => {
+    if (!focusedMarkerId) return null;
+    const town = sortedTowns.find(
+      t => `marker-${getStableTownMarkerId(t)}` === focusedMarkerId
+    );
+    return town ? getStableTownMarkerId(town) : null;
+  }, [sortedTowns, focusedMarkerId]);
+  useHiddenTownLabel(focusedTownId);
 
   const handleFocus = useCallback((markerId: string) => {
     setFocusedMarkerId(markerId);

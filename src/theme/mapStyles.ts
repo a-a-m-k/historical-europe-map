@@ -148,9 +148,9 @@ function getTownMarkerStyles(): string {
 
   .town-marker-label-content {
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-size: 10px;
+    padding: 0.2em 0.6em;
+    border-radius: 0.6em;
+    font-size: var(--town-marker-label-font-size, 10px);
     font-weight: 500;
     color: #172434;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
@@ -168,9 +168,8 @@ function getTownMarkerStyles(): string {
   }
 
   .town-marker-label-population {
-    font-size: 8px;
     opacity: 0.8;
-    margin-top: 1px;
+    margin-top: 0.1em;
   }
 `;
 }

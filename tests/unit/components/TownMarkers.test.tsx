@@ -7,6 +7,7 @@ import type { Town } from "@/common/types";
 
 const disableTownMarkerFocusSpy = vi.hoisted(() => vi.fn());
 const keyDownSpy = vi.hoisted(() => vi.fn());
+const useHiddenTownLabelSpy = vi.hoisted(() => vi.fn());
 
 vi.mock("@/utils/markers", () => ({
   disableTownMarkerFocus: (element: HTMLElement) =>
@@ -18,6 +19,7 @@ vi.mock("@/hooks/map", () => ({
   useMarkerKeyboardNavigation:
     () => (e: React.KeyboardEvent, markerId: string) =>
       keyDownSpy(e, markerId),
+  useHiddenTownLabel: (townId: string | null) => useHiddenTownLabelSpy(townId),
 }));
 
 vi.mock("@/components/map/MapView/TownMarkers/TownMarkerItem", () => ({
@@ -105,5 +107,17 @@ describe("TownMarkers interactions", () => {
     fireEvent.blur(bigTownMarker);
     expect(disableTownMarkerFocusSpy).toHaveBeenCalled();
     expect(bigTownMarker).toHaveAttribute("data-focused", "false");
+  });
+
+  it("hides the symbol label of the focused town only while focused", () => {
+    render(<TownMarkers towns={towns} selectedYear={selectedYear} />);
+    expect(useHiddenTownLabelSpy).toHaveBeenLastCalledWith(null);
+
+    const bigTownMarker = screen.getByTestId("marker-BigTown");
+    fireEvent.focus(bigTownMarker);
+    expect(useHiddenTownLabelSpy).toHaveBeenLastCalledWith("BigTown");
+
+    fireEvent.blur(bigTownMarker);
+    expect(useHiddenTownLabelSpy).toHaveBeenLastCalledWith(null);
   });
 });

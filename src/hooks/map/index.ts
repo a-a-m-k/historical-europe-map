@@ -7,7 +7,11 @@ export {
   measurePerformance,
 } from "./activation/useMapActivationGate";
 export { useStableMapKey, getMapDeviceKey } from "./activation/useStableMapKey";
-export { useInitialMapState, useSeedMapCamera, computeInitialMapState } from "./runtime/useInitialMapState";
+export {
+  useInitialMapState,
+  useSeedMapCamera,
+  computeInitialMapState,
+} from "./runtime/useInitialMapState";
 export { useMapContainerResize } from "./runtime/useMapContainerResize";
 export { useMapViewLibreEffects } from "./runtime/useMapViewLibreEffects";
 export { useMapStyleSwitchLoader } from "./runtime/useMapStyleSwitchLoader";
@@ -24,6 +28,7 @@ export { useNavigationControlAccessibility } from "./interactions/useNavigationC
 export { useTownsGeoJSON } from "./data/useTownsGeoJSON";
 export { useTownsData } from "./data/useTownsData";
 export { useMarkerKeyboardNavigation } from "./interactions/useMarkerKeyboardNavigation";
+export { useHiddenTownLabel } from "./interactions/useHiddenTownLabel";
 export { useDeferredOverlayActivation } from "./activation/useDeferredOverlayActivation";
 export {
   useMapViewOrchestration,

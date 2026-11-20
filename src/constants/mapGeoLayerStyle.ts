@@ -1,4 +1,6 @@
+import type { ExpressionSpecification } from "maplibre-gl";
 import type { MapBaseStyleMode } from "@/utils/map/style/terrainStyle";
+import { MAP_LABEL_HIDDEN_STATE } from "@/constants/map";
 import { MAX_MARKER_SIZE } from "@/constants/population";
 import {
   MAP_GEO_LABEL_HALO_DARK,
@@ -41,12 +43,20 @@ export const MAP_GEOJSON_MARKERS = {
 export const MARKER_EDGE_PADDING_PX =
   MAX_MARKER_SIZE + MAP_GEOJSON_MARKERS.circleStrokeWidth + 4;
 
+/** Hides a town's symbol label while its HTML focused-marker label is shown. */
+const MAP_TEXT_LABEL_OPACITY: ExpressionSpecification = [
+  "case",
+  ["boolean", ["feature-state", MAP_LABEL_HIDDEN_STATE], false],
+  0,
+  1,
+];
+
 /** MapLibre `symbol` layer paint for town name labels on a light basemap. */
 export const MAP_TEXT_LABEL_PAINT_LIGHT = {
   "text-color": MAP_GEOJSON_MARKERS.labelLight.text,
   "text-halo-color": MAP_GEOJSON_MARKERS.labelLight.halo,
   "text-halo-width": 0.8,
-  "text-opacity": 1,
+  "text-opacity": MAP_TEXT_LABEL_OPACITY,
 } as const;
 
 /** MapLibre `symbol` layer paint for town name labels on a dark basemap. */
@@ -55,7 +65,7 @@ export const MAP_TEXT_LABEL_PAINT_DARK = {
   "text-halo-color": MAP_GEOJSON_MARKERS.labelDark.halo,
   "text-halo-width": 1,
   "text-halo-blur": 0,
-  "text-opacity": 1,
+  "text-opacity": MAP_TEXT_LABEL_OPACITY,
 };
 
 /**
